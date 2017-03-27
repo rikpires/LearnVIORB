@@ -85,6 +85,12 @@ void IMUPreintegrator::update(const Vector3d& omega, const Vector3d& acc, const 
     Matrix3d dR = Expmap(omega*dt);
     Matrix3d Jr = JacobianR(omega*dt);
 
+    /**
+     * Forster 2015 RSS supplementary equation (A.7)-(A.9)
+     * Note that the order is [p, v, phi] here, while [phi, v , p] in the supplementary.
+     * Noise items are separated into Bg and Ca.
+     */
+
     // noise covariance propagation of delta measurements
     // err_k+1 = A*err_k + B*err_gyro + C*err_acc
     Matrix3d I3x3 = Matrix3d::Identity();
@@ -102,7 +108,9 @@ void IMUPreintegrator::update(const Vector3d& omega, const Vector3d& acc, const 
         Bg*IMUData::getGyrMeasCov()*Bg.transpose() +
         Ca*IMUData::getAccMeasCov()*Ca.transpose();
 
-
+    /**
+     * NOT coincide with Forster 2015 RSS supplementary equation (A.20), why?
+     */
     // jacobian of delta measurements w.r.t bias of gyro/acc
     // update P first, then V, then R
     _J_P_Biasa += _J_V_Biasa*dt - 0.5*_delta_R*dt2;
@@ -111,6 +119,9 @@ void IMUPreintegrator::update(const Vector3d& omega, const Vector3d& acc, const 
     _J_V_Biasg += -_delta_R*skew(acc)*_J_R_Biasg*dt;
     _J_R_Biasg = dR.transpose()*_J_R_Biasg - Jr*dt;
 
+    /**
+     * Forster 2015 RSS supplementary equation (A.10)
+     */
     // delta measurements, position/velocity/rotation(matrix)
     // update P first, then V, then R. because P's update need V&R's previous state
     _delta_P += _delta_V*dt + 0.5*_delta_R*acc*dt2;    // P_k+1 = P_k + V_k*dt + R_k*a_k*dt*dt/2

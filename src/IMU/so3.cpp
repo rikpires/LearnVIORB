@@ -29,6 +29,13 @@ namespace Sophus
 {
 
 // right jacobian of SO(3)
+/**
+ * Forster2015 eq(8) or Barfoot eq(7.73a)
+ * Perturbation in the right side, exp(phi)*exp(delta_phi)
+ * Approximate from BCH formula
+ * @param  w [description]
+ * @return   [description]
+ */
 Matrix3d SO3::JacobianR(const Vector3d& w)
 {
     Matrix3d Jr = Matrix3d::Identity();
@@ -47,6 +54,12 @@ Matrix3d SO3::JacobianR(const Vector3d& w)
     }
     return Jr;
 }
+/**
+ * Barfoot eq(7.72a)
+ * What is the difference between (7.37b) and (7.72a)
+ * @param  w [description]
+ * @return   [description]
+ */
 Matrix3d SO3::JacobianRInv(const Vector3d& w)
 {
     Matrix3d Jrinv = Matrix3d::Identity();
@@ -89,11 +102,22 @@ Matrix3d SO3::JacobianRInv(const Vector3d& w)
 }
 
 // left jacobian of SO(3), Jl(x) = Jr(-x)
+/**
+ * Barfoot eq(7.73b)
+ * Perturbation in the left side, exp(delta_phi)*exp(phi)
+ * @param  w [description]
+ * @return   [description]
+ */
 Matrix3d SO3::JacobianL(const Vector3d& w)
 {
     return JacobianR(-w);
 }
 // left jacobian inverse
+/**
+ * Barfoot eq(7.72b)
+ * @param  w [description]
+ * @return   [description]
+ */
 Matrix3d SO3::JacobianLInv(const Vector3d& w)
 {
     return JacobianRInv(-w);
@@ -178,7 +202,7 @@ Matrix3d SO3
 {
   return matrix();
 }
-
+/// skew matrix of unit vector
 Matrix3d SO3
 ::generator(int i)
 {
@@ -188,7 +212,7 @@ Matrix3d SO3
   e[i] = 1.f;
   return hat(e);
 }
-
+/// Convert from SO3 to Vector3d
 Vector3d SO3
 ::log() const
 {
@@ -253,6 +277,12 @@ SO3 SO3
   return expAndTheta(omega, &theta);
 }
 
+/**
+ * Convert Vector3d to unit length quaternion
+ * t = a.norm
+ * ht = theta*0.5
+ * q(w,x,y,z) = [cos(ht), sin(a)/t]
+ */
 SO3 SO3
 ::expAndTheta(const Vector3d & omega, double * theta)
 {

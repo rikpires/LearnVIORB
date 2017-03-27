@@ -74,6 +74,7 @@ private:
     Sophus::SO3 _R;
 
     // keep unchanged during optimization
+    // Use below delta_bias for update, fixed here for computation / update convenience
     Vector3d _BiasGyr;   // bias of gyroscope
     Vector3d _BiasAcc;   // bias of accelerometer
 

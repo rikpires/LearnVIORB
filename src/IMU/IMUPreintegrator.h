@@ -35,11 +35,11 @@ public:
     {
         return _delta_P;
     }
-        inline Eigen::Vector3d getDeltaV() const    // V_k+1 = V_k + R_k*a_k*dt
+    inline Eigen::Vector3d getDeltaV() const    // V_k+1 = V_k + R_k*a_k*dt
     {
         return _delta_V;
     }
-        inline Eigen::Matrix3d getDeltaR() const   // R_k+1 = R_k*exp(w_k*dt).     NOTE: Rwc, Rwc'=Rwc*[w_body]x
+    inline Eigen::Matrix3d getDeltaR() const   // R_k+1 = R_k*exp(w_k*dt).     NOTE: Rwc, Rwc'=Rwc*[w_body]x
     {
         return _delta_R;
     }
@@ -88,7 +88,9 @@ public:
     {
         return SO3::exp(v).matrix();
     }
-    
+    /**
+     * The same as so3.h
+     */
     // right jacobian of SO(3)
     static Matrix3d JacobianR(const Vector3d& w)
     {
@@ -184,11 +186,13 @@ private:
     */
 
     // delta measurements, position/velocity/rotation(matrix)
+    // Forster 2015 RSS supplementary equation (A.10)
     Eigen::Vector3d _delta_P;    // P_k+1 = P_k + V_k*dt + R_k*a_k*dt*dt/2
     Eigen::Vector3d _delta_V;    // V_k+1 = V_k + R_k*a_k*dt
     Eigen::Matrix3d _delta_R;    // R_k+1 = R_k*exp(w_k*dt).     note: Rwc, Rwc'=Rwc*[w_body]x
 
     // jacobian of delta measurements w.r.t bias of gyro/acc
+    // Used in Forster 2015 RSS equation (36)
     Eigen::Matrix3d _J_P_Biasg;     // position / gyro
     Eigen::Matrix3d _J_P_Biasa;     // position / acc
     Eigen::Matrix3d _J_V_Biasg;     // velocity / gyro
